@@ -28,7 +28,7 @@ typedef struct _node{
 	//for accessability
 }node;
 
-process initProcess(char* ID, int init, int age, int priority, int cpu){
+process initProcess(char* ID, int init, int priority, int age, int cpu){
 	process temp;
 	temp.ID = ID;
 	temp.init=init;
@@ -154,7 +154,8 @@ int main(int argc, char* argv[]){
     int tempRequired;
     char *tempName= (char *) malloc(60);
     int i = 0;
-    while( fscanf (fp,"%s %d %d %d %d", tempName,&tempArrival,&tempPriority,&tempAge,&tempRequired)!= EOF ) 
+    printf("while a");
+	while( fscanf (fp,"%s %d %d %d %d", tempName,&tempArrival,&tempPriority,&tempAge,&tempRequired)!= EOF )
     {
         arr[i] = initProcess(tempName,tempArrival,tempPriority,tempAge,tempRequired);
         tempName = (char *) malloc(60);
@@ -204,8 +205,10 @@ int main(int argc, char* argv[]){
 			currentList = &queue21;
 			break;
 		default:
+		    printf("priority is %d/n", arr[0].priority);
 			printf("invalid priority detected. please check initprocess and while(arr[currentNodeVal])");
-		
+			return 0;
+
 	}
 	int nextTimeToAdd=arr[0].init;
 	int currentNodeVal=0;
@@ -268,12 +271,14 @@ int main(int argc, char* argv[]){
 					else
 					{
 						currentList = NULL;
+						printf("DELETING NULL, SKELETONS IS %d", skeletons);
 					}
 				}
 			}
 		}
 		if(nextTimeToAdd==tick){
 			//add new processes here
+			printf("while a");
 			while(arr[currentNodeVal].init==tick){
 				node temp=initNode(&arr[currentNodeVal]);
 				switch(temp.data->priority){
@@ -393,6 +398,23 @@ int main(int argc, char* argv[]){
 		//queue 2 runs are 10 ticks long and needs their priority reduced by one every 2 runs or 20 cycles.
 		//queue 3 runs are 20 ticks
 		//ageing section starts here
+
+		printf("above runFinished; %d\n", runFinished);
+		int a=0;
+		if(currentList==&queue6){
+			a=6;
+		}
+		else if(currentList==&queue5){
+			a=5;
+		}
+		else if(currentList==&queue43){
+			a=43;
+		}else{
+			a=21;
+		}
+		printf("current list is %d\n", a);
+		if(currentList==NULL)printf("head was Null\n");
+		printf("skeletons = %d", skeletons);
 		if(runFinished){
 			//age everything by 1
 			node* walker=queue21.head;
@@ -402,7 +424,7 @@ int main(int argc, char* argv[]){
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
 					walker->data->priority++;
-					if(walker->priority>2){
+					if(walker->data->priority>2){
 						process* temp;
 						if(queue21.head->next == NULL)
 						{
@@ -418,6 +440,7 @@ int main(int argc, char* argv[]){
 						add(&queue43, &newNode);
 					}
 				}
+				printf("inside while do 1\n");
 			}while(walker!=queue21.head);
 			walker=queue43.head;
 			do{
@@ -426,7 +449,7 @@ int main(int argc, char* argv[]){
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
 					walker->data->priority++;
-					if(walker->priority>4){
+					if(walker->data->priority>4){
 						process* temp;
 						if(queue43.head->next == NULL)
 						{
@@ -441,6 +464,7 @@ int main(int argc, char* argv[]){
 						add(&queue5, &newNode);
 					}
 				}
+				printf("inside while do 2\n");
 			}while(walker!=queue43.head);
 			//might have some problems here so printing a reminder
 			printf("check while loops are running below if(runFinished)");
