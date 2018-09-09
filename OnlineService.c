@@ -190,8 +190,8 @@ int main(int argc, char* argv[]){
 				}
 				currentNodeVal++;
 			}
-			//also check if new processes need to be the currently running nodes.
 		}
+		//also check if new processes need to be the currently running nodes.
 		//increment the current process.
 		
 		//check if the current process needs to be moved to the back of the line or demoted to another queue.
