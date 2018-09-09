@@ -278,6 +278,7 @@ int main(int argc, char* argv[]){
 					if(walker->priority>2){
 						process* temp=removeNode(&queue21, walker);
 						node newNode=initNode(temp);
+						newNode.data->numOfTimesServiced=0;
 						add(&queue43, &newNode);
 					}
 				}
@@ -290,9 +291,10 @@ int main(int argc, char* argv[]){
 				if(walker->data->age>7){
 					walker->priority++;
 					walker->data->priority++;
-					if(walker->priority>2){
+					if(walker->priority>4){
 						process* temp=removeNode(&queue43, walker);
 						node newNode=initNode(temp);
+						newNode.data->numOfTimesServiced=0;
 						add(&queue5, &newNode);
 					}
 				}
