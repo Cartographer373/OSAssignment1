@@ -1,7 +1,8 @@
 /**
  *student: Samuel Desmond Kurtzer
  *ID:A1687068
- *project was completed alone.
+ *student: Ryan James Faulkner
+ *ID:A1707190
  *
  **/
 #include <stdlib.h>
@@ -190,7 +191,8 @@ int main(int argc, char* argv[]){
 				}
 				currentNodeVal++;
 			}
-			//also check if new processes need to be the currently running nodes.
+			nextTimeToAdd = currentNodeVal.init;
+			if()
 		}
 		//increment the current process.
 		
