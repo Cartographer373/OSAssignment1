@@ -135,7 +135,6 @@ int main(int argc, char* argv[]){
     int i = 0;
     while( fscanf (fp,"%s %d %d %d %d", tempName,&tempArrival,&tempPriority,&tempAge,&tempRequired)!= EOF ) 
     {
-        /* writing content to stdout */
         arr[i] = initProcess(tempName,tempArrival,tempPriority,tempAge,tempRequired);
         tempName = (char *) malloc(60);
         i++;
@@ -165,34 +164,101 @@ int main(int argc, char* argv[]){
 	ll queue21=initList();
 	//
 	//get code here
-	int tick = 0;
+	int tick = arr[0].init;
 	ll* currentList;
+	switch(arr[0].priority){
+		case 6:
+			currentList = &queue6;
+			break;
+		case 5:
+			currentList = &queue5;
+			break;
+		case 4:
+		case 3:
+			currentList = &queue43;
+			break;
+		case 2:
+		case 1:
+			currentList = &queue21;
+			break;
+		default:
+			printf("invalid priority detected. please check initprocess and while(arr[currentNodeVal])");
+		
+	}
 	int nextTimeToAdd=arr[0].init;
 	int currentNodeVal=0;
+	int ticksThisRun = 0;
 	while(true){
 		if(nextTimeToAdd==tick){
 			//add new processes here
 			while(arr[currentNodeVal].init==tick){
 				node temp=initNode(&arr[currentNodeVal]);
-				switch(temp.data->priority){
+				switch(temp.priority){
 					case 6:
 						add(&queue6, &temp);
+						break;
 					case 5:
 						add(&queue5, &temp);
+						break;
 					case 4:
 					case 3:
 						add(&queue43, &temp);
+						break;
 					case 2:
 					case 1:
 						add(&queue21, &temp);
+						break;
 					default:
 						printf("invalid priority detected. please check initprocess and while(arr[currentNodeVal])");
 					
 				}
 				currentNodeVal++;
 			}
-			nextTimeToAdd = currentNodeVal.init;
-			if()
+			nextTimeToAdd = arr[currentNodeVal].init;
+			//if currentNode in array is further in array than there were lines in input file, set timeToAdd as -1 so we never add another node, we reached end of the list
+			if(currentNodeVal == i)
+			{
+				nextTimeToAdd = -1;
+			}
+			//this switch statement checks if higher queues which used to be empty had nodes added to them, and if so changes the current list and resets the ticksThisRun counter.
+			//also moves the node which was being done to the back of it's own queue if it was in the middle of running
+			if(currentList == &queue5 || currentList == &queue43 || currentList == &queue21)
+			{
+				if(currentList == &queue43 || currentList == &queue21)
+				{
+
+					if(currentList == &queue21)
+					{
+						if(isEmpty(&queue43))
+						{
+							if(ticksThisRun != 0)
+							{
+								rotate(currentList);
+							}
+							currentList = &queue43;
+							ticksThisRun = 0;
+						}
+					}
+					if(isEmpty(&queue5) == false)
+					{
+						if(ticksThisRun != 0)
+						{
+							rotate(currentList);
+						}
+						currentList = &queue5;
+						ticksThisRun = 0;
+					}
+				}
+				if(isEmpty(&queue6) == false)
+				{
+					if(ticksThisRun != 0)
+					{
+						rotate(currentList);
+					}
+					currentList = &queue6;
+					ticksThisRun = 0;
+				}
+			}
 		}
 		//increment the current process.
 		
