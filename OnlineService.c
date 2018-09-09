@@ -12,7 +12,7 @@
 
 typedef struct _process{
 	char* ID;
-	int init;
+	int init; //arrival time
 	int age;
 	int priority;
 	int cpu;
@@ -121,7 +121,42 @@ process removeNode(ll* list, node* toDelete){
 
 
 int main(int argc, char* argv[]){
-	
+
+	FILE *fp;
+    fp = fopen("sample-input.txt", "r");
+    process arr[60];
+    char str[60];
+    int tempArrival;
+    int tempPriority;
+    int tempAge;
+    int tempRequired;
+    char *tempName= (char *) malloc(60);
+    int i = 0;
+    while( fscanf (fp,"%s %d %d %d %d", tempName,&tempArrival,&tempPriority,&tempAge,&tempRequired)!= EOF ) 
+    {
+        /* writing content to stdout */
+        arr[i] = initProcess(tempName,tempArrival,tempPriority,tempAge,tempRequired);
+        tempName = (char *) malloc(60);
+        i++;
+    }
+    fclose(fp);
+    process tempProcess;
+    for(int j = 1; j < i; j++)
+    {
+        for(int k = j; k > 0 ; k--)
+        {
+            if(arr[k].init < arr[k-1].init)
+            {
+                tempProcess = arr[k-1];
+                arr[k-1] = arr[k];
+                arr[k] = tempProcess;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
 	//queue init
 	ll queue6=initList();
 	ll queue5=initList();
@@ -130,7 +165,6 @@ int main(int argc, char* argv[]){
 	//
 	//get code here
 	int tick = 0;
-	process arr[100];
 	ll* currentList;
 	int nextTimeToAdd=arr[0].init;
 	int currentNodeVal=0;
@@ -155,7 +189,6 @@ int main(int argc, char* argv[]){
 					
 				}
 				currentNodeVal++;
-				
 			}
 			//also check if new processes need to be the currently running nodes.
 		}
