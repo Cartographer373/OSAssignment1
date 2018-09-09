@@ -294,25 +294,24 @@ int main(int argc, char* argv[]){
 		//Decrease priority if needed, and rotate if needed
 		if(ticksThisRun != 0 && runFinished == true)
 		{
-			int temp=currentList->head->data->priority--;
-			if(currentList==&queue6 && temp<6){
-				process* data = removeNode(currentList, currentList->head);
-				node temp=initNode(data);
-				add(&queue5, &temp);
-			}else if(currentList==&queue5){
-				process* data = removeNode(currentList, currentList->head);
-				node temp=initNode(data);
-				add(&queue5, &temp);
-			}else if(currentList==&queue43){
-				process* data = removeNode(currentList, currentList->head);
-				node temp=initNode(data);
-				add(&queue5, &temp);
-			}else if(currentList==&queue21){
-				process* data = removeNode(currentList, currentList->head);
-				node temp=initNode(data);
-				add(&queue5, &temp);
-			}else{
-				printf("current list is inproperly set, check //decrease priority if needed");
+			int numOfTimesServiced=currentList->head->data->numOfTimesServiced;
+			if((numOfTimesServiced==5 && (currentList==&queue6||currentList==&queue5)) || (numOfTimesServiced==2 && (currentList==&queue43))){
+				int temp=currentList->head->data->priority--;
+				if(currentList==&queue6 && temp<6){
+					process* data = removeNode(currentList, currentList->head);
+					node temp=initNode(data);
+					add(&queue5, &temp);
+				}else if(currentList==&queue5){
+					process* data = removeNode(currentList, currentList->head);
+					node temp=initNode(data);
+					add(&queue5, &temp);
+				}else if(currentList==&queue43){
+					process* data = removeNode(currentList, currentList->head);
+					node temp=initNode(data);
+					add(&queue5, &temp);
+				}else{
+					printf("current list is inproperly set, check //decrease priority if needed");
+				}
 			}
 			rotate(currentList);
 		}
