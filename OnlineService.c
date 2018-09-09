@@ -6,9 +6,7 @@
  **/
 #include <stdlib.h>
 #include <stdio.h>
-
-#define true 1
-#define false !true
+#include <stdbool.h>
 
 typedef struct _process{
 	char* ID;
@@ -90,7 +88,7 @@ int isEmpty(ll* list){
 	return false;
 }
 
-process removeNode(ll* list, node* toDelete){
+process* removeNode(ll* list, node* toDelete){
 	node* walker=list->head;
 	process* ret;
 	if(list->head==toDelete){
@@ -116,7 +114,7 @@ process removeNode(ll* list, node* toDelete){
 		walker->prev=NULL;
 		ret=walker->data;
 	}
-	return *ret;
+	return ret;
 }
 
 
@@ -198,8 +196,43 @@ int main(int argc, char* argv[]){
 		//queue 1 runs are 5  ticks and priority is reduced
 		//queue 2 runs are 10 ticks long and needs their priority reduced by one every 2 runs or 20 cycles.
 		//queue 3 runs are 20 ticks
-
-
+		//ageing section starts here
+		if(runFinished){
+			//age everything by 1
+			node* walker=queue21.head;
+			while(walker!=queue21.head){
+				walker->data->age++;
+				walker=walker->next;
+				//also needs to check if age has gone over;
+				if(walker->data->age>7){
+					walker->priority++;
+					walker->data->priority++;
+					if(walker->priority>2){
+						process* temp=removeNode(&queue21, walker);
+						node newNode=initNode(temp);
+						add(&queue43, &newNode);
+					}
+				}
+			}
+			walker=queue43.head;
+			while(walker!=queue43.head){
+				walker->data->age++;
+				walker=walker->next;
+				//also needs to check if age has gone over;
+				if(walker->data->age>7){
+					walker->priority++;
+					walker->data->priority++;
+					if(walker->priority>2){
+						process* temp=removeNode(&queue43, walker);
+						node newNode=initNode(temp);
+						add(&queue5, &newNode);
+					}
+				}
+			}
+			//might have some problems here so printing a reminder
+			printf("check while loops are running below if(runFinished)");
+			runFinished=false;
+		}
 		//promote processes
 		tick++;
 	}
