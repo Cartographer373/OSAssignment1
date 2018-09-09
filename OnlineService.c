@@ -15,7 +15,10 @@ typedef struct _process{
 	int age;
 	int priority;
 	int cpu;
+	int cpuOriginal;
 	int numOfTimesServiced;
+	int endTime;
+	int readyTime;
 }process;
 
 typedef struct _node{
@@ -32,7 +35,10 @@ process initProcess(char* ID, int init, int age, int priority, int cpu){
 	temp.age=age;
 	temp.priority=priority;
 	temp.cpu=cpu;
+	temp.cpuOriginal = cpu;
 	temp.numOfTimesServiced=0;
+	temp.endTime = -1;
+	temp.readyTime = -1;
 	return temp;
 }
 
@@ -93,6 +99,15 @@ process* removeNode(ll* list, node* toDelete){
 	if(list->head==toDelete){
 		list->head=list->head->next;
 		list->tail->next=list->head;
+		if(list->head == list->tail)
+		{
+			list->head->next = NULL;
+			list->head->prev = NULL;
+		}
+		else
+		{
+			list->head->prev = list->tail;
+		}
 		walker->next=NULL;
 		ret=walker->data;
 	}else if(list->tail==toDelete){
@@ -103,6 +118,11 @@ process* removeNode(ll* list, node* toDelete){
 		walker->next=NULL;
 		walker->prev=NULL;
 		ret=walker->data;
+		if(list->head == list->tail)
+		{
+			list->head->next = NULL;
+			list->head->prev = NULL;
+		}
 	}
 	else{
 		node* forwards=toDelete->next;
@@ -112,6 +132,11 @@ process* removeNode(ll* list, node* toDelete){
 		walker->next=NULL;
 		walker->prev=NULL;
 		ret=walker->data;
+		if(list->head == list->tail)
+		{
+			list->head->next = NULL;
+			list->head->prev = NULL;
+		}
 	}
 	return ret;
 }
@@ -158,6 +183,7 @@ int main(int argc, char* argv[]){
 	ll queue5=initList();
 	ll queue43=initList();
 	ll queue21=initList();
+	ll graveyard=initList();
 	//
 	//get code here
 	int tick = arr[0].init;
@@ -185,7 +211,9 @@ int main(int argc, char* argv[]){
 	int currentNodeVal=0;
 	int ticksThisRun = 0;
 	int runFinished = false;
-	while(true){
+	int skeletons = 0;
+	//skeletons is number of processes that have "died", once all processes have finished loop ends
+	while(skeletons < i){
 		if(ticksThisRun == 5 && (currentList == &queue5 || currentList == &queue6))
 		{
 			runFinished = true;
@@ -200,6 +228,49 @@ int main(int argc, char* argv[]){
 		{
 			runFinished = true;
 			currentList->head->data->numOfTimesServiced++;
+		}
+		if(currentList != NULL)
+		{
+			if(currentList->head->data->cpu == 0)
+			{
+				ticksThisRun == 0;
+				currentList->head->data->endTime = tick;
+				add(&graveyard, currentList->head);
+				skeletons++;
+				if(currentList->head != currentList->head->next)
+				{
+					currentList->tail->next = currentList->head->next;
+					currentList->head->next->prev = currentList->tail;
+					currentList->head = currentList->head->next;
+					//if after removing an node there is only one node left, remove it's tail
+					if(currentList->head == currentList->head->next)
+					{
+						currentList->tail = NULL;
+						currentList->head->next = NULL;
+						currentList->head->prev = NULL;
+					}
+				}
+				else
+				{
+					*currentList = initList();
+					if(isEmpty(&queue5) == false)
+					{
+						currentList = &queue5;
+					}
+					else if(isEmpty(&queue43) == false)
+					{
+						currentList = &queue43;
+					}
+					else if(isEmpty(&queue21) == false)
+					{
+						currentList = &queue21;
+					}
+					else
+					{
+						currentList = NULL;
+					}
+				}
+			}
 		}
 		if(nextTimeToAdd==tick){
 			//add new processes here
@@ -331,8 +402,17 @@ int main(int argc, char* argv[]){
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
 					walker->data->priority++;
-					if(walker->data->priority>2){
-						process* temp=removeNode(&queue21, walker);
+					if(walker->priority>2){
+						process* temp;
+						if(queue21.head->next == NULL)
+						{
+							temp = queue21.head->data;
+							queue21 = initList();
+						}
+						else
+						{
+							temp = removeNode(&queue21, walker);
+						}
 						node newNode=initNode(temp);
 						newNode.data->numOfTimesServiced=0;
 						add(&queue43, &newNode);
@@ -346,13 +426,17 @@ int main(int argc, char* argv[]){
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
 					walker->data->priority++;
-					if(walker->data->priority>4){
-						process* temp=removeNode(&queue43, walker);
-						node newNode=initNode(temp);
-						newNode.data->numOfTimesServiced=0;
-					}
-					if(walker->data->priority>2){
-						process* temp=removeNode(&queue43, walker);
+					if(walker->priority>4){
+						process* temp;
+						if(queue43.head->next == NULL)
+						{
+							temp = queue43.head->data;
+							queue43 = initList();
+						}
+						else
+						{
+							temp = removeNode(&queue21, walker);
+						}
 						node newNode=initNode(temp);
 						add(&queue5, &newNode);
 					}
@@ -362,8 +446,25 @@ int main(int argc, char* argv[]){
 			printf("check while loops are running below if(runFinished)");
 			runFinished=false;
 		}
+		//if current process is being run for the first time set its ready time
+		if(currentList != NULL)
+		{
+			if(currentList->head->data->readyTime == -1)
+			{
+				currentList->head->data->readyTime = tick;
+			}
+			ticksThisRun++;
+			currentList->head->data->cpu--;
+		}
 		//promote processes
 		tick++;
+	}
+	node * printNode = graveyard.head;
+	for(int a = 0; a < skeletons; a++)
+	{
+		int wait = printNode->data->endTime - printNode->data->readyTime - printNode->data->cpuOriginal;
+		printf("%s     %d     %d     %d     %d     %d     %d",printNode->data->ID,printNode->data->priority,printNode->data->init,printNode->data->endTime,printNode->data->readyTime,printNode->data->cpuOriginal,wait);
+		printNode = printNode->next;
 	}
     return 0;
 }
