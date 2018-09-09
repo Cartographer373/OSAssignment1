@@ -331,7 +331,6 @@ int main(int argc, char* argv[]){
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
 					walker->data->priority++;
-					walker->data->priority++;
 					if(walker->data->priority>2){
 						process* temp=removeNode(&queue21, walker);
 						node newNode=initNode(temp);
@@ -346,7 +345,6 @@ int main(int argc, char* argv[]){
 				walker=walker->next;
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
-					walker->data->priority++;
 					walker->data->priority++;
 					if(walker->data->priority>4){
 						process* temp=removeNode(&queue43, walker);
