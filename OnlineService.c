@@ -23,7 +23,6 @@ typedef struct _node{
 	struct _node* prev;
 	process* data;
 	//for accessability
-	int priority;
 }node;
 
 process initProcess(char* ID, int init, int age, int priority, int cpu){
@@ -42,7 +41,6 @@ node initNode(process* d){
 	temp.next=NULL;
 	temp.data=d;
 	temp.prev=NULL;
-	temp.priority=d->priority;
 	return temp;
 }
 
@@ -191,23 +189,23 @@ int main(int argc, char* argv[]){
 		if(ticksThisRun == 5 && (currentList == &queue5 || currentList == &queue6))
 		{
 			runFinished = true;
-			currentList->head->numOfTimesServiced++;
+			currentList->head->data->numOfTimesServiced++;
 		}
 		else if(ticksThisRun == 10 && (currentList == &queue43))
 		{
 			runFinished = true;
-			currentList->head->numOfTimesServiced++;
+			currentList->head->data->numOfTimesServiced++;
 		}
 		else if(ticksThisRun == 20 && (currentList == &queue21))
 		{
 			runFinished = true;
-			currentList->head->numOfTimesServiced++;
+			currentList->head->data->numOfTimesServiced++;
 		}
 		if(nextTimeToAdd==tick){
 			//add new processes here
 			while(arr[currentNodeVal].init==tick){
 				node temp=initNode(&arr[currentNodeVal]);
-				switch(temp.priority){
+				switch(temp.data->priority){
 					case 6:
 						add(&queue6, &temp);
 						break;
@@ -251,7 +249,7 @@ int main(int argc, char* argv[]){
 								//if a run has finished and ticksThisRun is not 0 then we haven't deleted it yet and need to decrease priority before rotation
 								if(runFinished == true)
 								{
-									currentList->head->priority--;
+									currentList->head->data->priority--;
 								}
 								rotate(currentList);
 							}
@@ -266,7 +264,7 @@ int main(int argc, char* argv[]){
 							//if a run has finished and ticksThisRun is not 0 then we haven't deleted it yet and need to decrease priority before rotation
 							if(runFinished == true)
 							{
-								currentList->head->priority--;
+								currentList->head->data->priority--;
 							}
 							rotate(currentList);
 						}
@@ -281,7 +279,7 @@ int main(int argc, char* argv[]){
 						 //if a run has finished and ticksThisRun is not 0 then we haven't deleted it yet and need to decrease priority before rotation
 						if(runFinished == true)
 						{
-							currentList->head->priority--;
+							currentList->head->data->priority--;
 						}
 						rotate(currentList);
 					}
@@ -296,7 +294,26 @@ int main(int argc, char* argv[]){
 		//Decrease priority if needed, and rotate if needed
 		if(ticksThisRun != 0 && runFinished == true)
 		{
-			currentList->head->priority--;
+			int temp=currentList->head->data->priority--;
+			if(currentList==&queue6 && temp<6){
+				process* data = removeNode(currentList, currentList->head);
+				node temp=initNode(data);
+				add(&queue5, &temp);
+			}else if(currentList==&queue5){
+				process* data = removeNode(currentList, currentList->head);
+				node temp=initNode(data);
+				add(&queue5, &temp);
+			}else if(currentList==&queue43){
+				process* data = removeNode(currentList, currentList->head);
+				node temp=initNode(data);
+				add(&queue5, &temp);
+			}else if(currentList==&queue21){
+				process* data = removeNode(currentList, currentList->head);
+				node temp=initNode(data);
+				add(&queue5, &temp);
+			}else{
+				printf("current list is inproperly set, check //decrease priority if needed");
+			}
 			rotate(currentList);
 		}
 		//increment the current process.
@@ -314,9 +331,9 @@ int main(int argc, char* argv[]){
 				walker=walker->next;
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
-					walker->priority++;
 					walker->data->priority++;
-					if(walker->priority>2){
+					walker->data->priority++;
+					if(walker->data->priority>2){
 						process* temp=removeNode(&queue21, walker);
 						node newNode=initNode(temp);
 						newNode.data->numOfTimesServiced=0;
@@ -330,14 +347,14 @@ int main(int argc, char* argv[]){
 				walker=walker->next;
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
-					walker->priority++;
 					walker->data->priority++;
-					if(walker->priority>4){
+					walker->data->priority++;
+					if(walker->data->priority>4){
 						process* temp=removeNode(&queue43, walker);
 						node newNode=initNode(temp);
 						newNode.data->numOfTimesServiced=0;
 					}
-					if(walker->priority>2){
+					if(walker->data->priority>2){
 						process* temp=removeNode(&queue43, walker);
 						node newNode=initNode(temp);
 						add(&queue5, &newNode);
