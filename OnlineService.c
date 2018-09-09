@@ -26,7 +26,6 @@ typedef struct _node{
 	struct _node* prev;
 	process* data;
 	//for accessability
-	int priority;
 }node;
 
 process initProcess(char* ID, int init, int age, int priority, int cpu){
@@ -48,7 +47,6 @@ node initNode(process* d){
 	temp.next=NULL;
 	temp.data=d;
 	temp.prev=NULL;
-	temp.priority=d->priority;
 	return temp;
 }
 
@@ -278,7 +276,7 @@ int main(int argc, char* argv[]){
 			//add new processes here
 			while(arr[currentNodeVal].init==tick){
 				node temp=initNode(&arr[currentNodeVal]);
-				switch(temp.priority){
+				switch(temp.data->priority){
 					case 6:
 						add(&queue6, &temp);
 						break;
@@ -367,7 +365,25 @@ int main(int argc, char* argv[]){
 		//Decrease priority if needed, and rotate if needed
 		if(ticksThisRun != 0 && runFinished == true)
 		{
-			currentList->head->data->priority--;
+			int numOfTimesServiced=currentList->head->data->numOfTimesServiced;
+			if((numOfTimesServiced==5 && (currentList==&queue6||currentList==&queue5)) || (numOfTimesServiced==2 && (currentList==&queue43))){
+				int temp=currentList->head->data->priority--;
+				if(currentList==&queue6 && temp<6){
+					process* data = removeNode(currentList, currentList->head);
+					node temp=initNode(data);
+					add(&queue5, &temp);
+				}else if(currentList==&queue5){
+					process* data = removeNode(currentList, currentList->head);
+					node temp=initNode(data);
+					add(&queue5, &temp);
+				}else if(currentList==&queue43){
+					process* data = removeNode(currentList, currentList->head);
+					node temp=initNode(data);
+					add(&queue5, &temp);
+				}else{
+					printf("current list is inproperly set, check //decrease priority if needed");
+				}
+			}
 			rotate(currentList);
 		}
 		//increment the current process.
@@ -385,7 +401,6 @@ int main(int argc, char* argv[]){
 				walker=walker->next;
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
-					walker->priority++;
 					walker->data->priority++;
 					if(walker->priority>2){
 						process* temp;
@@ -410,7 +425,6 @@ int main(int argc, char* argv[]){
 				walker=walker->next;
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
-					walker->priority++;
 					walker->data->priority++;
 					if(walker->priority>4){
 						process* temp;
