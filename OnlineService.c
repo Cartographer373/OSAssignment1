@@ -186,7 +186,23 @@ int main(int argc, char* argv[]){
 	int nextTimeToAdd=arr[0].init;
 	int currentNodeVal=0;
 	int ticksThisRun = 0;
+	int runFinished = false;
 	while(true){
+		if(ticksThisRun == 5 && (currentList == &queue5 || currentList == &queue6))
+		{
+			runFinished = true;
+			currentList->head->numOfTimesServiced++;
+		}
+		else if(ticksThisRun == 10 && (currentList == &queue43))
+		{
+			runFinished = true;
+			currentList->head->numOfTimesServiced++;
+		}
+		else if(ticksThisRun == 20 && (currentList == &queue21))
+		{
+			runFinished = true;
+			currentList->head->numOfTimesServiced++;
+		}
 		if(nextTimeToAdd==tick){
 			//add new processes here
 			while(arr[currentNodeVal].init==tick){
@@ -218,6 +234,7 @@ int main(int argc, char* argv[]){
 			{
 				nextTimeToAdd = -1;
 			}
+			//preemption code
 			//this switch statement checks if higher queues which used to be empty had nodes added to them, and if so changes the current list and resets the ticksThisRun counter.
 			//also moves the node which was being done to the back of it's own queue if it was in the middle of running
 			if(currentList == &queue5 || currentList == &queue43 || currentList == &queue21)
@@ -231,6 +248,11 @@ int main(int argc, char* argv[]){
 						{
 							if(ticksThisRun != 0)
 							{
+								//if a run has finished and ticksThisRun is not 0 then we haven't deleted it yet and need to decrease priority before rotation
+								if(runFinished == true)
+								{
+									currentList->head->priority--;
+								}
 								rotate(currentList);
 							}
 							currentList = &queue43;
@@ -241,6 +263,11 @@ int main(int argc, char* argv[]){
 					{
 						if(ticksThisRun != 0)
 						{
+							//if a run has finished and ticksThisRun is not 0 then we haven't deleted it yet and need to decrease priority before rotation
+							if(runFinished == true)
+							{
+								currentList->head->priority--;
+							}
 							rotate(currentList);
 						}
 						currentList = &queue5;
@@ -251,12 +278,26 @@ int main(int argc, char* argv[]){
 				{
 					if(ticksThisRun != 0)
 					{
+						 //if a run has finished and ticksThisRun is not 0 then we haven't deleted it yet and need to decrease priority before rotation
+						if(runFinished == true)
+						{
+							currentList->head->priority--;
+						}
 						rotate(currentList);
 					}
 					currentList = &queue6;
 					ticksThisRun = 0;
 				}
 			}
+		}
+		//if a run has finished and ticksThisRun is not 0 then we haven't deleted it yet and need to decrease priority before rotation
+		
+
+		//Decrease priority if needed, and rotate if needed
+		if(ticksThisRun != 0 && runFinished == true)
+		{
+			currentList->head->priority--;
+			rotate(currentList);
 		}
 		//increment the current process.
 		
@@ -268,7 +309,7 @@ int main(int argc, char* argv[]){
 		if(runFinished){
 			//age everything by 1
 			node* walker=queue21.head;
-			while(walker!=queue21.head){
+			do{
 				walker->data->age++;
 				walker=walker->next;
 				//also needs to check if age has gone over;
@@ -278,36 +319,31 @@ int main(int argc, char* argv[]){
 					if(walker->priority>2){
 						process* temp=removeNode(&queue21, walker);
 						node newNode=initNode(temp);
-<<<<<<< HEAD
 						newNode.data->numOfTimesServiced=0;
-=======
->>>>>>> a5fb45261e5f87f35c13d628ccaa7e4b52111b9f
 						add(&queue43, &newNode);
 					}
 				}
-			}
+			}while(walker!=queue21.head);
 			walker=queue43.head;
-			while(walker!=queue43.head){
+			do{
 				walker->data->age++;
 				walker=walker->next;
 				//also needs to check if age has gone over;
 				if(walker->data->age>7){
 					walker->priority++;
 					walker->data->priority++;
-<<<<<<< HEAD
 					if(walker->priority>4){
 						process* temp=removeNode(&queue43, walker);
 						node newNode=initNode(temp);
 						newNode.data->numOfTimesServiced=0;
-=======
+					}
 					if(walker->priority>2){
 						process* temp=removeNode(&queue43, walker);
 						node newNode=initNode(temp);
->>>>>>> a5fb45261e5f87f35c13d628ccaa7e4b52111b9f
 						add(&queue5, &newNode);
 					}
 				}
-			}
+			}while(walker!=queue43.head);
 			//might have some problems here so printing a reminder
 			printf("check while loops are running below if(runFinished)");
 			runFinished=false;
