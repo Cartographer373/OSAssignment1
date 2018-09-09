@@ -85,6 +85,11 @@ void rotate(ll* list){
 	list->head=list->head->next;
 }
 
+int isEmpty(ll* list){
+	if(list->head==NULL)return true;
+	return false;
+}
+
 process removeNode(ll* list, node* toDelete){
 	node* walker=list->head;
 	process* ret;
@@ -153,12 +158,11 @@ int main(int argc, char* argv[]){
         }
     }
 	//queue init
-	ll queue1=initList();
-	ll queue2=initList();
-	ll queue3=initList();
-	ll queue4=initList();
-
-	
+	ll queue6=initList();
+	ll queue5=initList();
+	ll queue43=initList();
+	ll queue21=initList();
+	//
 	//get code here
 	int tick = 0;
 	ll* currentList;
@@ -168,8 +172,23 @@ int main(int argc, char* argv[]){
 		if(nextTimeToAdd==tick){
 			//add new processes here
 			while(arr[currentNodeVal].init==tick){
-				//node temp=initNode();
-
+				node temp=initNode(&arr[currentNodeVal]);
+				switch(temp.data->priority){
+					case 6:
+						add(&queue6, &temp);
+					case 5:
+						add(&queue5, &temp);
+					case 4:
+					case 3:
+						add(&queue43, &temp);
+					case 2:
+					case 1:
+						add(&queue21, &temp);
+					default:
+						printf("invalid priority detected. please check initprocess and while(arr[currentNodeVal])");
+					
+				}
+				currentNodeVal++;
 			}
 			//also check if new processes need to be the currently running nodes.
 		}
